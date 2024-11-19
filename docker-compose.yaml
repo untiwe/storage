@@ -1,0 +1,18 @@
+services:
+  db:
+    image: postgres
+    restart: always
+    container_name: storage_database
+    environment:
+      POSTGRES_PASSWORD: postgres
+    # volumes:
+    #   - ${SHOPAPI_POSTGRES_DATA}:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+  
+  main:
+    image: storage
+    restart: always
+    container_name: storage_main
+    ports:
+      - 8080:8080
