@@ -3,10 +3,10 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"storage/db"
 )
 
 func hello(w http.ResponseWriter, req *http.Request) {
-
 	if req.Method == http.MethodGet {
 		fmt.Fprintf(w, "hello\n")
 	} else {
@@ -26,6 +26,8 @@ func headers(w http.ResponseWriter, req *http.Request) {
 }
 
 func main() {
+
+	db.Init()
 
 	http.HandleFunc("/hello", hello)
 	http.HandleFunc("/headers", headers)
