@@ -5,10 +5,12 @@ services:
     container_name: storage_database
     environment:
       POSTGRES_PASSWORD: postgres
-    # volumes:
-    #   - ${SHOPAPI_POSTGRES_DATA}:/var/lib/postgresql/data
+    volumes:
+      - pgdata:/var/lib/postgresql/data
     ports:
       - 5432:5432
+    networks:
+      - docker_net
   
   main:
     image: storage
@@ -16,3 +18,13 @@ services:
     container_name: storage_main
     ports:
       - 8080:8080
+    networks:
+      - docker_net
+
+networks:
+  docker_net:
+    name: docker_net
+    driver: bridge
+
+volumes:
+  pgdata:
