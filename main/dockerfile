@@ -1,8 +1,7 @@
 FROM golang:1.23
 
 WORKDIR /usr/src/app
-COPY *.go ./
-COPY go.mod ./
+COPY . .
 RUN go mod download
 RUN go build
 

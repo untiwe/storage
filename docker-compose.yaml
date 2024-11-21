@@ -20,6 +20,18 @@ services:
       - 8080:8080
     networks:
       - docker_net
+    environment:
+      DB_URL: "storage_database"
+    depends_on:
+      - db
+
+  kafka:
+    image: apache/kafka
+    container_name: kafka
+    ports:
+      - 9092:9092
+    networks:
+      - docker_net
 
 networks:
   docker_net:

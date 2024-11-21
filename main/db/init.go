@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/lib/pq"
 	_ "github.com/lib/pq"
@@ -119,12 +120,21 @@ func createTables(db *sql.DB) error {
 }
 
 func Init() {
+
+	dbURL := os.Getenv("DB_URL")
+	if dbURL == "" {
+		dbURL = "localhost"
+	}
+
 	// Параметры подключения к базе данных
-	connStr := "user=postgres sslmode=disable password=postgres host=localhost port=5432"
+	connStr := "user=postgres sslmode=disable password=postgres host=" + dbURL + " port=5432"
+
+	println(connStr)
 
 	//создаем БД (если нету)
 	createDatabaseIfNotExists("shared", connStr)
 
+	println("created DB")
 	//добавляем пожклчюение БД
 	connStr += " dbname=shared"
 	// Подключение к базе данных

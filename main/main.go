@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net/http"
 	"storage/db"
+	"storage/kafka"
+	"time"
 )
 
 func hello(w http.ResponseWriter, req *http.Request) {
@@ -25,10 +27,19 @@ func headers(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
+func send(w http.ResponseWriter, req *http.Request) {
+	kafka.SendMessage(time.Now().String())
+	w.WriteHeader(http.StatusOK)
+
+}
+
 func main() {
 
 	db.Init()
+	kafka.Init()
+	kafka.ReadKafka()
 
+	http.HandleFunc("/send", send)
 	http.HandleFunc("/hello", hello)
 	http.HandleFunc("/headers", headers)
 
