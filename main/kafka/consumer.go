@@ -4,13 +4,14 @@ import (
 	"context"
 	"fmt"
 	"storage/db"
+	"storage/kache"
 	"time"
 
 	"github.com/segmentio/kafka-go"
 )
 
 // https://github.com/segmentio/kafka-go
-func ReadKafka() {
+func ReadKafka(kache *kache.StringSet) {
 	// Создание ридера Kafka
 	r := kafka.NewReader(kafka.ReaderConfig{
 		Brokers:   []string{"localhost:9092"},
@@ -26,6 +27,7 @@ func ReadKafka() {
 				fmt.Printf("Error read message from kafka")
 				break
 			}
+			kache.Add(string(m.Value))
 			db.WriteData(string(m.Value))
 		}
 	}()

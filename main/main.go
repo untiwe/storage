@@ -4,9 +4,12 @@ import (
 	"fmt"
 	"net/http"
 	"storage/db"
+	"storage/kache"
 	"storage/kafka"
 	"time"
 )
+
+var kacheData *kache.StringSet
 
 func hello(w http.ResponseWriter, req *http.Request) {
 	if req.Method == http.MethodGet {
@@ -18,30 +21,34 @@ func hello(w http.ResponseWriter, req *http.Request) {
 
 }
 
-func headers(w http.ResponseWriter, req *http.Request) {
-
-	for name, headers := range req.Header {
-		for _, h := range headers {
-			fmt.Fprintf(w, "%v: %v\n", name, h)
-		}
-	}
-}
-
 func send(w http.ResponseWriter, req *http.Request) {
 	kafka.SendMessage(time.Now().String())
 	w.WriteHeader(http.StatusOK)
 
 }
 
+func allRecords(w http.ResponseWriter, req *http.Request) {
+
+	w.Header().Set("Content-Type", "text/plain")
+
+	// Записываем каждую строку с новой строки
+	for _, record := range kacheData.GetAll() {
+		w.Write([]byte(record + "\n"))
+	}
+
+}
+
 func main() {
+
+	kacheData = kache.NewStringSet(1000)
 
 	db.Init()
 	kafka.Init()
-	kafka.ReadKafka()
+	kafka.ReadKafka(kacheData)
 
 	http.HandleFunc("/send", send)
 	http.HandleFunc("/hello", hello)
-	http.HandleFunc("/headers", headers)
+	http.HandleFunc("/all", allRecords)
 
 	http.ListenAndServe(":8080", nil)
 }
