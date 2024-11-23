@@ -2,8 +2,12 @@ package kafka
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
+	// "log"
+
+	"storage/conventions"
 	"storage/db"
 	"time"
 
@@ -29,7 +33,22 @@ func ReadKafka() {
 				fmt.Printf("Error read message from kafka")
 				break
 			}
-			db.WriteData(string(m.Value))
+
+			var order conventions.Order
+			err = json.Unmarshal([]byte(m.Value), &order)
+			if err != nil {
+				fmt.Println("Error unmarshal message:", err)
+			}
+
+			//пробуем записать в базу
+			err = db.InsertOrder(order)
+			if err != nil {
+				fmt.Println("Order is not Insert:", err)
+				return
+			}
+
+			//если удачно, дополняем кеш
+			kache.Add(string(m.Value))
 		}
 	}()
 }

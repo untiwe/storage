@@ -28,5 +28,11 @@ func (s *StringSet) Add(str string) {
 
 // GetAll возвращает все строки в наборе
 func (s *StringSet) GetAll() []string {
-	return s.strings
+	var filteredStrings []string
+	for _, str := range s.strings {
+		if str != "" {
+			filteredStrings = append(filteredStrings, str)
+		}
+	}
+	return filteredStrings
 }

@@ -7,7 +7,15 @@ import (
 	"github.com/segmentio/kafka-go"
 )
 
-func Init() {
+type CacheInterface interface {
+	Add(string)
+}
+
+var kache CacheInterface
+
+func Init(k CacheInterface) {
+
+	kache = k
 
 	conn, err := kafka.Dial("tcp", "localhost:9092")
 	if err != nil {
