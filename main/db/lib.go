@@ -40,5 +40,6 @@ func createConnection() (*sql.DB, error) {
 	if err != nil {
 		return nil, fmt.Errorf("ошибка соединения с базой данных: %v", err)
 	}
+
 	return db, nil
 }

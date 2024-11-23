@@ -3,15 +3,16 @@ package kafka
 import (
 	"context"
 	"fmt"
+
 	"storage/db"
-	"storage/kache"
 	"time"
 
 	"github.com/segmentio/kafka-go"
+	// "golang.org/x/text/message"
 )
 
 // https://github.com/segmentio/kafka-go
-func ReadKafka(kache *kache.StringSet) {
+func ReadKafka() {
 	// Создание ридера Kafka
 	r := kafka.NewReader(kafka.ReaderConfig{
 		Brokers:   []string{"localhost:9092"},
@@ -19,7 +20,8 @@ func ReadKafka(kache *kache.StringSet) {
 		Partition: 0,
 		MaxBytes:  10e6, // 10MB
 	})
-	r.SetOffsetAt(context.Background(), time.Now().Add(-24*time.Hour))
+	//Не читаем предыдыущие сообщения. Они должны быть в базе.
+	r.SetOffsetAt(context.Background(), time.Now())
 	go func() {
 		for {
 			m, err := r.ReadMessage(context.Background())
@@ -27,7 +29,6 @@ func ReadKafka(kache *kache.StringSet) {
 				fmt.Printf("Error read message from kafka")
 				break
 			}
-			kache.Add(string(m.Value))
 			db.WriteData(string(m.Value))
 		}
 	}()

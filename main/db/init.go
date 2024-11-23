@@ -9,6 +9,13 @@ import (
 	_ "github.com/lib/pq"
 )
 
+type CacheInterface interface {
+	Add(string)
+	GetAll() []string
+}
+
+var kache CacheInterface
+
 // создает базу данных, если она не существует
 func createDatabaseIfNotExists(connStr string) error {
 
@@ -118,7 +125,9 @@ func createTables(db *sql.DB) error {
 	return nil
 }
 
-func Init() {
+func Init(k CacheInterface) {
+
+	kache = k
 
 	connStr := createConnectionString(false)
 	//создаем БД (если нету)

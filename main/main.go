@@ -42,9 +42,10 @@ func main() {
 
 	kacheData = kache.NewStringSet(1000)
 
-	db.Init()
+	db.Init(kacheData)
+	db.FillСache()
 	kafka.Init()
-	kafka.ReadKafka(kacheData)
+	kafka.ReadKafka()
 
 	http.HandleFunc("/send", send)
 	http.HandleFunc("/hello", hello)
