@@ -4,22 +4,21 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
-	"os"
 
 	"github.com/lib/pq"
 	_ "github.com/lib/pq"
 )
 
-// createDatabaseIfNotExists создает базу данных, если она не существует
-func createDatabaseIfNotExists(dbName, connStr string) error {
-	// Подключение к базе данных PostgreSQL
+// создает базу данных, если она не существует
+func createDatabaseIfNotExists(connStr string) error {
+
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		return fmt.Errorf("ошибка подключения к базе данных: %v", err)
 	}
 	defer db.Close()
 
-	_, err = db.Exec("create database " + dbName)
+	_, err = db.Exec("create database " + DbName)
 	if err != nil {
 		if pqErr, ok := err.(*pq.Error); ok && pqErr.Code == "42P04" { //Если БД уже есть - ок
 			return nil
@@ -121,20 +120,10 @@ func createTables(db *sql.DB) error {
 
 func Init() {
 
-	dbURL := os.Getenv("DB_URL")
-	if dbURL == "" {
-		dbURL = "localhost"
-	}
-
-	// Параметры подключения к базе данных
-	connStr := "user=postgres sslmode=disable password=postgres host=" + dbURL + " port=5432"
-
-	println(connStr)
-
+	connStr := createConnectionString(false)
 	//создаем БД (если нету)
-	createDatabaseIfNotExists("shared", connStr)
+	createDatabaseIfNotExists(connStr)
 
-	println("created DB")
 	//добавляем пожклчюение БД
 	connStr += " dbname=shared"
 	// Подключение к базе данных
