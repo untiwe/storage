@@ -11,27 +11,48 @@ services:
       - 5432:5432
     networks:
       - docker_net
-  
+
   main:
     image: storage
     restart: always
     container_name: storage_main
+    # volumes: 
+    #   - ~/config.yaml:/usr/src/app/config.yaml
     ports:
       - 8080:8080
     networks:
       - docker_net
     environment:
       DB_URL: "storage_database"
+      KAFKA_URL: "kafka"
     depends_on:
       - db
+      - kafka
+
 
   kafka:
-    image: apache/kafka
+    image: confluentinc/cp-kafka:latest
     container_name: kafka
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+    depends_on:
+      - zookeeper
     ports:
       - 9092:9092
     networks:
       - docker_net
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+    networks:
+      - docker_net
+
 
 networks:
   docker_net:

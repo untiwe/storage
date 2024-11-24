@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"storage/config"
 
 	"github.com/lib/pq"
 	_ "github.com/lib/pq"
@@ -15,6 +16,7 @@ type CacheInterface interface {
 }
 
 var kache CacheInterface
+var DbName string
 
 // создает базу данных, если она не существует
 func createDatabaseIfNotExists(connStr string) error {
@@ -128,13 +130,14 @@ func createTables(db *sql.DB) error {
 func Init(k CacheInterface) {
 
 	kache = k
+	DbName = config.GetString("db-name")
 
 	connStr := createConnectionString(false)
 	//создаем БД (если нету)
 	createDatabaseIfNotExists(connStr)
 
 	//добавляем пожклчюение БД
-	connStr += " dbname=shared"
+	connStr += " dbname=" + config.GetString("db-name")
 	// Подключение к базе данных
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {

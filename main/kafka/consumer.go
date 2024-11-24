@@ -5,32 +5,30 @@ import (
 	"encoding/json"
 	"fmt"
 
-	// "log"
-
+	"storage/config"
 	"storage/conventions"
 	"storage/db"
 	"time"
 
 	"github.com/segmentio/kafka-go"
-	// "golang.org/x/text/message"
 )
 
-// https://github.com/segmentio/kafka-go
 func ReadKafka() {
 	// Создание ридера Kafka
 	r := kafka.NewReader(kafka.ReaderConfig{
-		Brokers:   []string{"localhost:9092"},
-		Topic:     "storage",
+		Brokers:   []string{kafkaURL + ":9092"},
+		Topic:     config.GetString("topic-name"),
 		Partition: 0,
 		MaxBytes:  10e6, // 10MB
 	})
 	//Не читаем предыдыущие сообщения. Они должны быть в базе.
 	r.SetOffsetAt(context.Background(), time.Now())
+
 	go func() {
 		for {
 			m, err := r.ReadMessage(context.Background())
 			if err != nil {
-				fmt.Printf("Error read message from kafka")
+				fmt.Println("Error read message from kafka", err)
 				break
 			}
 

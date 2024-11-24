@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"storage/config"
 	"storage/conventions"
 
 	_ "github.com/lib/pq"
@@ -35,12 +36,12 @@ func FetchAllOrdersData() ([]conventions.Order, error) {
 	defer db.Close()
 
 	// Извлечение данных из таблицы orders
-	rows, err := db.Query(`
-	SELECT order_uid, track_number, entry, locale, internal_signature, customer_id, delivery_service, shardkey, sm_id, date_created, oof_shard
+	req := fmt.Sprintf(`SELECT order_uid, track_number, entry, locale, internal_signature, customer_id, delivery_service, shardkey, sm_id, date_created, oof_shard
 	FROM orders
 	ORDER BY date_created DESC
-	LIMIT 1000
-`)
+	LIMIT %d`, config.GetInt("max-cahe"))
+
+	rows, err := db.Query(req)
 
 	if err != nil {
 		return nil, err

@@ -1,6 +1,6 @@
 package kache
 
-// StringSet тип для хранения набора строк с ограничением в 1000 строк
+// StringSet тип для хранения набора строк с ограничением строк
 type StringSet struct {
 	strings      []string
 	maxSize      int

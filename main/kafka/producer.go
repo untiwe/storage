@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"storage/config"
 	"sync"
 
 	"github.com/segmentio/kafka-go"
@@ -56,7 +57,7 @@ func SendMessage(message string) {
 	}
 
 	// Указание топика
-	topic := "storage"
+	topic := config.GetString("topic-name")
 
 	// Отправка сообщения
 	err := sendMessage(brokerURL, topic, message)

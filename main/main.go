@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"storage/config"
 	"storage/conventions"
 	"storage/db"
 	"storage/kache"
@@ -25,7 +26,6 @@ func hello(w http.ResponseWriter, req *http.Request) {
 func allRecords(w http.ResponseWriter, req *http.Request) {
 
 	w.Header().Set("Content-Type", "aplication/json")
-
 	var records []conventions.Order
 	for _, recordString := range kacheData.GetAll() {
 		var record conventions.Order
@@ -52,11 +52,12 @@ func generateOrder(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Only Get", http.StatusMethodNotAllowed)
 		return
 	}
-
 	order := conventions.GenerateRandomOrder()
 
 	orderJSON, _ := json.Marshal(order)
-	kafka.SendMessage(string(orderJSON))
+	go func() {
+		kafka.SendMessage(string(orderJSON))
+	}()
 
 	w.Write(orderJSON)
 
@@ -90,7 +91,7 @@ func index(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 
-	kacheData = kache.NewStringSet(1000)
+	kacheData = kache.NewStringSet(config.GetInt("max-cahe"))
 
 	db.Init(kacheData)
 	db.FillСache()

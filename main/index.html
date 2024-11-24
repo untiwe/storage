@@ -63,6 +63,7 @@
             <input type="number" id="index-input" class="index-input" placeholder="Enter index">
             <button id="go-button" class="control-button">Go</button>
             <button id="generate-button" class="control-button">Generate</button>
+            <button id="refresh-button" class="control-button">Refresh</button>
         </div>
         <div id="element-display" class="element-display"></div>
     </div>
@@ -74,9 +75,10 @@
             const names = await response.json();
 
             console.log(names);
-
-            elements = names
+            if (names != null)
+                elements = names
         }
+        console.log(elements)
 
         document.addEventListener('DOMContentLoaded', async () => {
             await loadelements()
@@ -88,6 +90,8 @@
             const indexInput = document.getElementById('index-input');
             const goButton = document.getElementById('go-button');
             const generateButton = document.getElementById('generate-button');
+            const refreshButton = document.getElementById('refresh-button');
+
 
             function displayElement() {
                 elementDisplay.textContent = JSON.stringify(elements[currentIndex], undefined, '\t');
@@ -114,15 +118,20 @@
                 }
             });
             counter.textContent = "Всего элементов " + elements.length;
-            displayElement();
 
             generateButton.addEventListener('click', async () => {
-                await fetch('generateorder');
-                location.reload();
-
-
+                await fetch('generateorder')
             });
+
+            refreshButton.addEventListener('click', async () => {
+
+                location.reload();
+            });
+
+            displayElement();
         });
+
+
 
     </script>
 </body>

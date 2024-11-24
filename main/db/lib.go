@@ -8,8 +8,6 @@ import (
 	_ "github.com/lib/pq"
 )
 
-const DbName = "shared"
-
 func createConnectionString(target bool) (connStr string) {
 
 	dbURL := os.Getenv("DB_URL")
