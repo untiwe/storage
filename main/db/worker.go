@@ -3,7 +3,6 @@ package db
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"storage/config"
 	"storage/conventions"
 
@@ -13,7 +12,7 @@ import (
 func FillСache() {
 	orders, err := FetchAllOrdersData()
 	if err != nil {
-		log.Fatal(err)
+		panic(err.Error())
 	}
 
 	for _, order := range orders {

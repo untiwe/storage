@@ -3,7 +3,6 @@ package db
 import (
 	"database/sql"
 	"fmt"
-	"log"
 	"storage/config"
 
 	"github.com/lib/pq"
@@ -17,6 +16,8 @@ type CacheInterface interface {
 
 var kache CacheInterface
 var DbName string
+var ownerName string
+var ownerPass string
 
 // создает базу данных, если она не существует
 func createDatabaseIfNotExists(connStr string) error {
@@ -32,7 +33,7 @@ func createDatabaseIfNotExists(connStr string) error {
 		if pqErr, ok := err.(*pq.Error); ok && pqErr.Code == "42P04" { //Если БД уже есть - ок
 			return nil
 		}
-		log.Fatal(err)
+		panic(err.Error())
 	}
 	return nil
 }
@@ -127,27 +128,55 @@ func createTables(db *sql.DB) error {
 	return nil
 }
 
+func createUser() {
+
+	db, err := sql.Open("postgres", createConnectionString(false, true))
+	if err != nil {
+		panic(err.Error())
+	}
+	defer db.Close()
+
+	createUserQuery := fmt.Sprintf(`CREATE USER %s  WITH PASSWORD '%s'`, ownerName, ownerPass)
+	_, err = db.Exec(createUserQuery)
+	if err != nil {
+		if pqErr, ok := err.(*pq.Error); ok && pqErr.Code == "42710" { //Если пользователь уже есть - ок
+			//pass
+		} else {
+			panic(err.Error())
+		}
+	}
+
+	grantPermissionsQuery := fmt.Sprintf(`GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO %s`, ownerName)
+	_, err = db.Exec(grantPermissionsQuery)
+	if err != nil {
+		panic(err.Error())
+	}
+
+}
+
 func Init(k CacheInterface) {
 
 	kache = k
-	DbName = config.GetString("db-name")
-
-	connStr := createConnectionString(false)
-	//создаем БД (если нету)
+	DbName = config.GetString("database.db-name")
+	ownerName = config.GetString("database.owner-name")
+	ownerPass = config.GetString("database.owner-pass")
+	connStr := createConnectionString(false, false)
 	createDatabaseIfNotExists(connStr)
+	createUser()
+	//создаем БД (если нету)
 
 	//добавляем пожклчюение БД
-	connStr += " dbname=" + config.GetString("db-name")
+	connStr += " dbname=" + DbName
 	// Подключение к базе данных
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
-		log.Fatal(err)
+		panic(err.Error())
 	}
 	defer db.Close()
 
 	// Создание таблиц
 	err = createTables(db)
 	if err != nil {
-		log.Fatal(err)
+		panic(err.Error())
 	}
 }

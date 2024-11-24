@@ -1,7 +1,6 @@
 package config
 
 import (
-	"log"
 	"sync"
 
 	"github.com/spf13/viper"
@@ -19,7 +18,7 @@ func Init() {
 		viper.AddConfigPath(".")
 
 		if err := viper.ReadInConfig(); err != nil {
-			log.Fatalf("Error reading config file, %s", err)
+			panic(err.Error())
 		}
 	})
 }
