@@ -32,9 +32,9 @@ func GetKafkaWriter(brokerURL, topic string) *kafka.Writer {
 // SendMessage отправляет сообщение "привет" в указанный топик Kafka.
 func sendMessage(brokerURL, topic string, message string) error {
 	// Одно подключение на всё время жизни приложения
-	if writer == nil {
-		writer = GetKafkaWriter(brokerURL, topic)
-	}
+
+	writer = GetKafkaWriter(brokerURL, topic)
+
 	// defer writer.Close()
 
 	// Отправка сообщения

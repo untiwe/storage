@@ -36,9 +36,12 @@ func FetchAllOrdersData() ([]conventions.Order, error) {
 
 	// Извлечение данных из таблицы orders
 	rows, err := db.Query(`
-		SELECT order_uid, track_number, entry, locale, internal_signature, customer_id, delivery_service, shardkey, sm_id, date_created, oof_shard
-		FROM orders
-	`)
+	SELECT order_uid, track_number, entry, locale, internal_signature, customer_id, delivery_service, shardkey, sm_id, date_created, oof_shard
+	FROM orders
+	ORDER BY date_created DESC
+	LIMIT 1000
+`)
+
 	if err != nil {
 		return nil, err
 	}
@@ -117,25 +120,6 @@ func FetchAllOrdersData() ([]conventions.Order, error) {
 	}
 
 	return orders, nil
-}
-
-// Обработчик для получения данных всех заказов
-func GetAllOrders() (data []byte, err error) {
-
-	// Извлечение данных всех заказов из базы данных
-	orders, err := FetchAllOrdersData()
-	if err != nil {
-		return nil, err
-	}
-
-	// Сериализация данных заказов в JSON
-	ordersJSON, err := json.Marshal(orders)
-	if err != nil {
-		return nil, err
-	}
-
-	return ordersJSON, nil
-
 }
 
 func InsertOrder(order conventions.Order) error {

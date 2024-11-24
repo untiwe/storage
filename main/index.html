@@ -30,9 +30,7 @@
         font-size: 20px;
         margin-top: 20px;
         white-space: pre-wrap;
-        /* Ensure whitespace is preserved */
         word-wrap: break-word;
-        /* Ensure long words are broken */
     }
 
     .controls {
@@ -116,7 +114,6 @@
                 }
             });
             counter.textContent = "Всего элементов " + elements.length;
-            // Initial display
             displayElement();
 
             generateButton.addEventListener('click', async () => {
