@@ -25,13 +25,16 @@ func GetKafkaWriter(brokerURL, topic string) *kafka.Writer {
 			Balancer: &kafka.LeastBytes{},
 		})
 	})
+
 	return writer
 }
 
 // SendMessage отправляет сообщение "привет" в указанный топик Kafka.
 func sendMessage(brokerURL, topic string, message string) error {
-	// Получение продюсера Kafka
-	writer := GetKafkaWriter(brokerURL, topic)
+	// Одно подключение на всё время жизни приложения
+	if writer == nil {
+		writer = GetKafkaWriter(brokerURL, topic)
+	}
 	// defer writer.Close()
 
 	// Отправка сообщения
@@ -42,7 +45,6 @@ func sendMessage(brokerURL, topic string, message string) error {
 		return fmt.Errorf("failed to write message: %v", err)
 	}
 
-	fmt.Println("Message sent successfully")
 	return nil
 }
 

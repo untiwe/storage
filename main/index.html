@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Element Switcher</title>
+</head>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        margin: 0;
+        background-color: #f0f0f0;
+    }
+
+    .counter {
+        font-size: 20px;
+        margin-top: 15px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .element-display {
+
+        font-size: 20px;
+        margin-top: 20px;
+        white-space: pre-wrap;
+        /* Ensure whitespace is preserved */
+        word-wrap: break-word;
+        /* Ensure long words are broken */
+    }
+
+    .controls {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .control-button {
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+        margin: 0 5px;
+    }
+
+    .index-input {
+        padding: 10px;
+        font-size: 16px;
+        margin: 0 5px;
+        width: 60px;
+    }
+</style>
+
+<body>
+    <div class="container">
+        <div class="counter" id="counter"></div>
+        <div class="controls">
+            <button id="prev-button" class="control-button">Previous</button>
+            <button id="next-button" class="control-button">Next</button>
+            <input type="number" id="index-input" class="index-input" placeholder="Enter index">
+            <button id="go-button" class="control-button">Go</button>
+            <button id="generate-button" class="control-button">Generate</button>
+        </div>
+        <div id="element-display" class="element-display"></div>
+    </div>
+    <script>
+        var elements = [];
+
+        async function loadelements() {
+            const response = await fetch('all');
+            const names = await response.json();
+
+            console.log(names);
+
+            elements = names
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadelements()
+            let currentIndex = 0;
+
+            const elementDisplay = document.getElementById('element-display');
+            const nextButton = document.getElementById('next-button');
+            const prevButton = document.getElementById('prev-button');
+            const indexInput = document.getElementById('index-input');
+            const goButton = document.getElementById('go-button');
+            const generateButton = document.getElementById('generate-button');
+
+            function displayElement() {
+                elementDisplay.textContent = JSON.stringify(elements[currentIndex], undefined, '\t');
+                indexInput.value = currentIndex;
+            }
+
+            nextButton.addEventListener('click', () => {
+                currentIndex = (currentIndex + 1) % elements.length;
+                displayElement();
+            });
+
+            prevButton.addEventListener('click', () => {
+                currentIndex = (currentIndex - 1 + elements.length) % elements.length;
+                displayElement();
+            });
+
+            goButton.addEventListener('click', () => {
+                const inputIndex = parseInt(indexInput.value, 10);
+                if (!isNaN(inputIndex) && inputIndex >= 0 && inputIndex < elements.length) {
+                    currentIndex = inputIndex;
+                    displayElement();
+                } else {
+                    alert('Неверный индекс числа');
+                }
+            });
+            counter.textContent = "Всего элементов " + elements.length;
+            // Initial display
+            displayElement();
+
+            generateButton.addEventListener('click', async () => {
+                await fetch('generateorder');
+                location.reload();
+
+
+            });
+        });
+
+    </script>
+</body>
+
+</html>

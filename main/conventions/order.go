@@ -1,6 +1,12 @@
 package conventions
 
-import "time"
+import (
+	"fmt"
+	"math/rand"
+	"time"
+
+	"github.com/google/uuid"
+)
 
 type Order struct {
 	OrderUID          string    `json:"order_uid"`
@@ -57,4 +63,79 @@ type Item struct {
 	NmID        int    `json:"nm_id"`
 	Brand       string `json:"brand"`
 	Status      int    `json:"status"`
+}
+
+// generateRandomString генерирует случайную строку заданной длины
+func generateRandomString(length int) string {
+	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	var seededRand *rand.Rand = rand.New(rand.NewSource(time.Now().UnixNano()))
+	b := make([]byte, length)
+	for i := range b {
+		b[i] = charset[seededRand.Intn(len(charset))]
+	}
+	return string(b)
+}
+
+// GenerateRandomOrder создает объект Order со случайными данными
+func GenerateRandomOrder() Order {
+	seededRand := rand.New(rand.NewSource(time.Now().UnixNano()))
+
+	var items []Item
+
+	for range seededRand.Intn(3) + 1 {
+		item := Item{
+			ChrtID:      seededRand.Intn(1000000),
+			TrackNumber: fmt.Sprintf("TRACK%d", seededRand.Intn(1000000)),
+			Price:       seededRand.Intn(1000),
+			Rid:         fmt.Sprintf("RID%d", seededRand.Intn(1000000)),
+			Name:        generateRandomString(10),
+			Sale:        seededRand.Intn(100),
+			Size:        generateRandomString(2),
+			TotalPrice:  seededRand.Intn(1000),
+			NmID:        seededRand.Intn(1000000),
+			Brand:       generateRandomString(10),
+			Status:      seededRand.Intn(10),
+		}
+
+		items = append(items, item)
+
+	}
+
+	order := Order{
+		OrderUID:    uuid.New().String(),
+		TrackNumber: fmt.Sprintf("TRACK%d", seededRand.Intn(1000000)),
+		Entry:       generateRandomString(4),
+		Delivery: Delivery{
+			Name:    generateRandomString(10),
+			Phone:   fmt.Sprintf("+%d", seededRand.Intn(10000000000)),
+			Zip:     fmt.Sprintf("%d", seededRand.Intn(1000000)),
+			City:    generateRandomString(10),
+			Address: generateRandomString(20),
+			Region:  generateRandomString(10),
+			Email:   fmt.Sprintf("%s@%s.com", generateRandomString(5), generateRandomString(5)),
+		},
+		Payment: Payment{
+			Transaction:  fmt.Sprintf("TRANS%d", seededRand.Intn(1000000)),
+			RequestID:    generateRandomString(10),
+			Currency:     generateRandomString(3),
+			Provider:     generateRandomString(10),
+			Amount:       seededRand.Intn(10000),
+			PaymentDT:    time.Now().Unix(),
+			Bank:         generateRandomString(10),
+			DeliveryCost: seededRand.Intn(5000),
+			GoodsTotal:   seededRand.Intn(1000),
+			CustomFee:    seededRand.Intn(100),
+		},
+		Items:             items,
+		Locale:            generateRandomString(2),
+		InternalSignature: generateRandomString(10),
+		CustomerID:        generateRandomString(10),
+		DeliveryService:   generateRandomString(10),
+		Shardkey:          generateRandomString(1),
+		SmID:              seededRand.Intn(100),
+		DateCreated:       time.Now(),
+		OofShard:          generateRandomString(1),
+	}
+
+	return order
 }

@@ -8,7 +8,6 @@ import (
 	"storage/db"
 	"storage/kache"
 	"storage/kafka"
-	// "time"
 )
 
 var kacheData *kache.StringSet
@@ -23,23 +22,43 @@ func hello(w http.ResponseWriter, req *http.Request) {
 
 }
 
-// func send(w http.ResponseWriter, req *http.Request) {
-// 	kafka.SendMessage(time.Now().String())
-// 	w.WriteHeader(http.StatusOK)
-
-// }
-
 func allRecords(w http.ResponseWriter, req *http.Request) {
 
 	w.Header().Set("Content-Type", "aplication/json")
 
-	recordsJSON, err := json.Marshal(kacheData.GetAll())
+	var records []conventions.Order
+	for _, recordString := range kacheData.GetAll() {
+		var record conventions.Order
+		if err := json.Unmarshal([]byte(recordString), &record); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		records = append(records, record)
+	}
+
+	recordsJSON, err := json.Marshal(records)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	// Записываем каждую строку с новой строки
 	w.Write(recordsJSON)
+
+}
+
+func generateOrder(w http.ResponseWriter, r *http.Request) {
+
+	if r.Method != http.MethodGet {
+		http.Error(w, "Only Get", http.StatusMethodNotAllowed)
+		return
+	}
+
+	order := conventions.GenerateRandomOrder()
+
+	orderJSON, _ := json.Marshal(order)
+	kafka.SendMessage(string(orderJSON))
+
+	w.Write(orderJSON)
 
 }
 
@@ -65,6 +84,10 @@ func addOrder(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func index(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "index.html")
+}
+
 func main() {
 
 	kacheData = kache.NewStringSet(1000)
@@ -75,9 +98,10 @@ func main() {
 	kafka.ReadKafka()
 
 	http.HandleFunc("/addorder", addOrder)
-	// http.HandleFunc("/send", send)
+	http.HandleFunc("/generateorder", generateOrder)
 	http.HandleFunc("/hello", hello)
 	http.HandleFunc("/all", allRecords)
+	http.HandleFunc("/", index)
 
 	http.ListenAndServe(":8080", nil)
 }

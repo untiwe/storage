@@ -9,6 +9,7 @@ require (
 
 require (
 	github.com/confluentinc/confluent-kafka-go v1.9.2 // indirect
+	github.com/google/uuid v1.6.0
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/klauspost/compress v1.15.11 // indirect
