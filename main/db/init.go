@@ -154,6 +154,7 @@ func createUser() {
 
 }
 
+// Инициализируем БД. Саму БД, пользователя, таблицы
 func Init(k CacheInterface) {
 
 	kache = k
@@ -161,13 +162,13 @@ func Init(k CacheInterface) {
 	ownerName = config.GetString("database.owner-name")
 	ownerPass = config.GetString("database.owner-pass")
 	connStr := createConnectionString(false, false)
+
 	createDatabaseIfNotExists(connStr)
 	createUser()
-	//создаем БД (если нету)
 
-	//добавляем пожклчюение БД
-	connStr += " dbname=" + DbName
-	// Подключение к базе данных
+	//После создания БД и пользователя, подключаемся к ней
+	connStr = createConnectionString(false, true)
+
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		panic(err.Error())

@@ -16,6 +16,7 @@ type CacheInterface interface {
 var kache CacheInterface
 var kafkaURL string
 
+// Создаем подключение к кафке, настраиваем ее, чекаем подключение
 func Init(k CacheInterface) {
 
 	kache = k

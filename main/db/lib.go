@@ -8,6 +8,9 @@ import (
 	_ "github.com/lib/pq"
 )
 
+// Генерируем нужную строку подключения к базе
+// targetUser ножно ли подключаться от пользователя
+// targetDB нужно ли подключаться к базе проекта
 func createConnectionString(targetUser bool, targetDB bool) (connStr string) {
 
 	user := "postgres"
@@ -19,7 +22,6 @@ func createConnectionString(targetUser bool, targetDB bool) (connStr string) {
 		dbURL = "localhost"
 	}
 
-	// Если уже настроена база т.е. подключаемся к конкретной
 	if targetUser {
 		user = ownerName
 		pass = ownerPass
@@ -33,9 +35,9 @@ func createConnectionString(targetUser bool, targetDB bool) (connStr string) {
 	return connStr
 }
 
+// Создаем подключение к нашей БД
 func createConnection() (*sql.DB, error) {
 
-	// Подключение к базе данных PostgreSQL
 	connStr := createConnectionString(true, true)
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {

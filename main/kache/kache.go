@@ -2,25 +2,25 @@ package kache
 
 import "sync"
 
-// StringSet тип для хранения набора строк с ограничением строк
-type StringSet struct {
+// OrdersSet тип для хранения набора строк с ограничением строк
+type OrdersSet struct {
 	strings      []string
 	maxSize      int
 	currentIndex int
 	mu           sync.Mutex
 }
 
-// NewStringSet создает новый набор строк с указанным максимальным размером
-func NewStringSet(maxSize int) *StringSet {
-	return &StringSet{
+// NewOrdersSet создает новый набор строк с указанным максимальным размером
+func NewOrdersSet(maxSize int) *OrdersSet {
+	return &OrdersSet{
 		strings:      make([]string, maxSize),
 		maxSize:      maxSize,
 		currentIndex: 0,
 	}
 }
 
-// Add добавляет новую строку в набор, поддерживая ограничение в максимальное количество строк
-func (s *StringSet) Add(str string) {
+// добавляем новый ordr в виде JSON
+func (s *OrdersSet) Add(str string) {
 
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -34,11 +34,11 @@ func (s *StringSet) Add(str string) {
 
 }
 
-// GetAll возвращает все строки в наборе
-func (s *StringSet) GetAll() []string {
+// Возвращаем все Orders
+func (s *OrdersSet) GetAll() []string {
 	var filteredStrings []string
 	for _, str := range s.strings {
-		if str != "" {
+		if str != "" { //фильтруем пустые строки
 			filteredStrings = append(filteredStrings, str)
 		}
 	}

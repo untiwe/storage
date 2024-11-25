@@ -13,6 +13,7 @@ import (
 	"github.com/segmentio/kafka-go"
 )
 
+// Запускаем ридер для кафки
 func ReadKafka() {
 	// Создание ридера Kafka
 	r := kafka.NewReader(kafka.ReaderConfig{
@@ -24,6 +25,7 @@ func ReadKafka() {
 	//Не читаем предыдыущие сообщения. Они должны быть в базе.
 	r.SetOffsetAt(context.Background(), time.Now())
 
+	//Читаем бесконечно в фоне
 	go func() {
 		for {
 			m, err := r.ReadMessage(context.Background())

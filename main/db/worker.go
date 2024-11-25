@@ -9,6 +9,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
+// Заполнить кеш данными из базы
 func FillСache() {
 	orders, err := FetchAllOrdersData()
 	if err != nil {
@@ -25,6 +26,7 @@ func FillСache() {
 
 }
 
+// Получить из базы наши записи orders
 func FetchAllOrdersData() ([]conventions.Order, error) {
 	var orders []conventions.Order
 
@@ -34,7 +36,7 @@ func FetchAllOrdersData() ([]conventions.Order, error) {
 	}
 	defer db.Close()
 
-	// Извлечение данных из таблицы orders
+	// Извлечение данных из таблицы orders (с учетом размера кеша, берем новые)
 	req := fmt.Sprintf(`SELECT order_uid, track_number, entry, locale, internal_signature, customer_id, delivery_service, shardkey, sm_id, date_created, oof_shard
 	FROM orders
 	ORDER BY date_created DESC
@@ -122,6 +124,7 @@ func FetchAllOrdersData() ([]conventions.Order, error) {
 	return orders, nil
 }
 
+// Добавляем новй заказ в таблицу
 func InsertOrder(order conventions.Order) error {
 
 	db, err := createConnection()

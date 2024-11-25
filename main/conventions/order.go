@@ -8,6 +8,7 @@ import (
 	"github.com/google/uuid"
 )
 
+// Тип нашего заказа
 type Order struct {
 	OrderUID          string    `json:"order_uid"`
 	TrackNumber       string    `json:"track_number"`
@@ -65,7 +66,7 @@ type Item struct {
 	Status      int    `json:"status"`
 }
 
-// generateRandomString генерирует случайную строку заданной длины
+// Кенерируем что-то похожее на текст
 func generateRandomString(length int) string {
 	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 	var seededRand *rand.Rand = rand.New(rand.NewSource(time.Now().UnixNano()))
@@ -76,12 +77,13 @@ func generateRandomString(length int) string {
 	return string(b)
 }
 
-// GenerateRandomOrder создает объект Order со случайными данными
+// Генерируем новый заказ
 func GenerateRandomOrder() Order {
 	seededRand := rand.New(rand.NewSource(time.Now().UnixNano()))
 
 	var items []Item
 
+	// Рандомим количество позицицй и из самих
 	for range seededRand.Intn(3) + 1 {
 		item := Item{
 			ChrtID:      seededRand.Intn(1000000),

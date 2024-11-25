@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"storage/config"
 	"storage/conventions"
@@ -11,18 +10,9 @@ import (
 	"storage/kafka"
 )
 
-var kacheData *kache.StringSet
+var kacheData *kache.OrdersSet
 
-func hello(w http.ResponseWriter, req *http.Request) {
-	if req.Method == http.MethodGet {
-		fmt.Fprintf(w, "hello\n")
-	} else {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("Only GET equest"))
-	}
-
-}
-
+// получить JSON со всеми записями
 func allRecords(w http.ResponseWriter, req *http.Request) {
 
 	w.Header().Set("Content-Type", "aplication/json")
@@ -46,6 +36,7 @@ func allRecords(w http.ResponseWriter, req *http.Request) {
 
 }
 
+// Сгенерировать тестовый order и отправить в брокер
 func generateOrder(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != http.MethodGet {
@@ -63,6 +54,7 @@ func generateOrder(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// Добавить order по полученому JSON
 func addOrder(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Only POST", http.StatusMethodNotAllowed)
@@ -85,13 +77,15 @@ func addOrder(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// вернуть странцу для отображения данных
 func index(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "index.html")
 }
 
 func main() {
 
-	kacheData = kache.NewStringSet(config.GetInt("max-cahe"))
+	//создаем кеш
+	kacheData = kache.NewOrdersSet(config.GetInt("max-cahe"))
 
 	db.Init(kacheData)
 	db.FillСache()
@@ -100,7 +94,6 @@ func main() {
 
 	http.HandleFunc("/addorder", addOrder)
 	http.HandleFunc("/generateorder", generateOrder)
-	http.HandleFunc("/hello", hello)
 	http.HandleFunc("/all", allRecords)
 	http.HandleFunc("/", index)
 
