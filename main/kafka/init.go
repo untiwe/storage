@@ -3,23 +3,17 @@ package kafka
 import (
 	"net"
 	"os"
-	"storage/config"
 	"strconv"
 
 	"github.com/segmentio/kafka-go"
+
+	"storage/config"
 )
 
-type CacheInterface interface {
-	Add(string)
-}
-
-var kache CacheInterface
 var kafkaURL string
 
 // Создаем подключение к кафке, настраиваем ее, чекаем подключение
-func Init(k CacheInterface) {
-
-	kache = k
+func init() {
 
 	kafkaURL = os.Getenv("KAFKA_URL")
 	if kafkaURL == "" {

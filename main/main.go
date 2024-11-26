@@ -3,26 +3,19 @@ package main
 import (
 	"encoding/json"
 	"net/http"
-	"storage/config"
+
+	"storage/cache"
 	"storage/conventions"
 	"storage/db"
-	"storage/kache"
 	"storage/kafka"
 )
-
-var kacheData *kache.OrdersSet
 
 // получить JSON со всеми записями
 func allRecords(w http.ResponseWriter, req *http.Request) {
 
 	w.Header().Set("Content-Type", "aplication/json")
 	var records []conventions.Order
-	for _, recordString := range kacheData.GetAll() {
-		var record conventions.Order
-		if err := json.Unmarshal([]byte(recordString), &record); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
+	for _, record := range cache.GetAll() {
 		records = append(records, record)
 	}
 
@@ -84,12 +77,7 @@ func index(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 
-	//создаем кеш
-	kacheData = kache.NewOrdersSet(config.GetInt("max-cahe"))
-
-	db.Init(kacheData)
 	db.FillСache()
-	kafka.Init(kacheData)
 	kafka.ReadKafka()
 
 	http.HandleFunc("/addorder", addOrder)

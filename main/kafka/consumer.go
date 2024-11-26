@@ -4,13 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-
-	"storage/config"
-	"storage/conventions"
-	"storage/db"
 	"time"
 
 	"github.com/segmentio/kafka-go"
+
+	"storage/cache"
+	"storage/config"
+	"storage/conventions"
+	"storage/db"
 )
 
 // Запускаем ридер для кафки
@@ -48,7 +49,7 @@ func ReadKafka() {
 			}
 
 			//если удачно, дополняем кеш
-			kache.Add(string(m.Value))
+			cache.Add(string(m.Value))
 		}
 	}()
 }

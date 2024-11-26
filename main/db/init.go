@@ -3,25 +3,21 @@ package db
 import (
 	"database/sql"
 	"fmt"
-	"storage/config"
 
 	"github.com/lib/pq"
 	_ "github.com/lib/pq"
+
+	"storage/config"
 )
 
-type CacheInterface interface {
-	Add(string)
-	GetAll() []string
-}
-
-var kache CacheInterface
 var DbName string
 var ownerName string
 var ownerPass string
 
 // создает базу данных, если она не существует
-func createDatabaseIfNotExists(connStr string) error {
+func createDatabaseIfNotExists() error {
 
+	connStr := createConnectionString(false, false)
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		return fmt.Errorf("ошибка подключения к базе данных: %v", err)
@@ -39,7 +35,16 @@ func createDatabaseIfNotExists(connStr string) error {
 }
 
 // createTables создает таблицы в PostgreSQL для модели данных
-func createTables(db *sql.DB) error {
+func createTables() {
+
+	connStr := createConnectionString(true, true)
+
+	db, err := sql.Open("postgres", connStr)
+	if err != nil {
+		panic(err.Error())
+	}
+	defer db.Close()
+
 	createOrdersTable := `
 	CREATE TABLE IF NOT EXISTS orders (
 		order_uid TEXT PRIMARY KEY,
@@ -105,32 +110,31 @@ func createTables(db *sql.DB) error {
 	);
 	`
 
-	_, err := db.Exec(createOrdersTable)
+	_, err = db.Exec(createOrdersTable)
 	if err != nil {
-		return err
+		panic(err.Error())
 	}
 
 	_, err = db.Exec(createDeliveriesTable)
 	if err != nil {
-		return err
+		panic(err.Error())
 	}
-
 	_, err = db.Exec(createPaymentsTable)
 	if err != nil {
-		return err
+		panic(err.Error())
 	}
 
 	_, err = db.Exec(createItemsTable)
 	if err != nil {
-		return err
+		panic(err.Error())
 	}
-
-	return nil
 }
 
 func createUser() {
 
-	db, err := sql.Open("postgres", createConnectionString(false, true))
+	connStr := createConnectionString(false, true)
+
+	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		panic(err.Error())
 	}
@@ -152,32 +156,26 @@ func createUser() {
 		panic(err.Error())
 	}
 
+	grantCreatePermissionsQuery := fmt.Sprintf(`GRANT CREATE ON SCHEMA public TO %s`, ownerName)
+	_, err = db.Exec(grantCreatePermissionsQuery)
+	if err != nil {
+		panic(err.Error())
+	}
+
 }
 
 // Инициализируем БД. Саму БД, пользователя, таблицы
-func Init(k CacheInterface) {
+func init() {
 
-	kache = k
 	DbName = config.GetString("database.db-name")
 	ownerName = config.GetString("database.owner-name")
 	ownerPass = config.GetString("database.owner-pass")
-	connStr := createConnectionString(false, false)
 
-	createDatabaseIfNotExists(connStr)
-	createUser()
+	createDatabaseIfNotExists()
 
 	//После создания БД и пользователя, подключаемся к ней
-	connStr = createConnectionString(false, true)
-
-	db, err := sql.Open("postgres", connStr)
-	if err != nil {
-		panic(err.Error())
-	}
-	defer db.Close()
+	createUser()
 
 	// Создание таблиц
-	err = createTables(db)
-	if err != nil {
-		panic(err.Error())
-	}
+	createTables()
 }

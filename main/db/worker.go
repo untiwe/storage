@@ -3,10 +3,12 @@ package db
 import (
 	"encoding/json"
 	"fmt"
-	"storage/config"
-	"storage/conventions"
 
 	_ "github.com/lib/pq"
+
+	"storage/cache"
+	"storage/config"
+	"storage/conventions"
 )
 
 // Заполнить кеш данными из базы
@@ -21,7 +23,7 @@ func FillСache() {
 		if err != nil {
 			panic(err.Error())
 		}
-		kache.Add(string(value))
+		cache.Add(string(value))
 	}
 
 }
