@@ -20,9 +20,9 @@ func init() {
 
 	var err error
 	cache, err = ristretto.NewCache(&ristretto.Config{
-		NumCounters: 1e7,                              // количество счетчиков для отслеживания частоты использования элементов
-		MaxCost:     int64(config.GetInt("max-cahe")), // максимальное количество элементов
-		BufferItems: 128,                              // количество элементов в буфере для уменьшения блокировок
+		NumCounters: 1e7,                          // количество счетчиков для отслеживания частоты использования элементов
+		MaxCost:     config.GetInt64("max-cache"), // максимальный объем кеша 10Мб
+		BufferItems: 128,                          // количество элементов в буфере для уменьшения блокировок
 	})
 	if err != nil {
 		panic(err)

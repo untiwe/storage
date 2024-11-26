@@ -1,4 +1,4 @@
-max-cahe: 1000
+max-cache: 10000000 #10мб
 topic-name: orders
 database:
   db-name: ordersdb

@@ -7,7 +7,6 @@ import (
 	_ "github.com/lib/pq"
 
 	"storage/cache"
-	"storage/config"
 	"storage/conventions"
 )
 
@@ -38,11 +37,10 @@ func FetchAllOrdersData() ([]conventions.Order, error) {
 	}
 	defer db.Close()
 
-	// Извлечение данных из таблицы orders (с учетом размера кеша, берем новые)
+	// Извлечение данных из таблицы orders (с начала берем новые)
 	req := fmt.Sprintf(`SELECT order_uid, track_number, entry, locale, internal_signature, customer_id, delivery_service, shardkey, sm_id, date_created, oof_shard
 	FROM orders
-	ORDER BY date_created DESC
-	LIMIT %d`, config.GetInt("max-cahe"))
+	ORDER BY date_created DESC`)
 
 	rows, err := db.Query(req)
 
