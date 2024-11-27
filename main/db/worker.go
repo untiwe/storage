@@ -8,6 +8,7 @@ import (
 
 	"storage/cache"
 	"storage/conventions"
+
 )
 
 // Заполнить кеш данными из базы
@@ -38,9 +39,9 @@ func FetchAllOrdersData() ([]conventions.Order, error) {
 	defer db.Close()
 
 	// Извлечение данных из таблицы orders (с начала берем новые)
-	req := fmt.Sprintf(`SELECT order_uid, track_number, entry, locale, internal_signature, customer_id, delivery_service, shardkey, sm_id, date_created, oof_shard
+	req := `SELECT order_uid, track_number, entry, locale, internal_signature, customer_id, delivery_service, shardkey, sm_id, date_created, oof_shard
 	FROM orders
-	ORDER BY date_created DESC`)
+	ORDER BY date_created`
 
 	rows, err := db.Query(req)
 
