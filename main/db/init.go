@@ -8,6 +8,7 @@ import (
 	_ "github.com/lib/pq"
 
 	"storage/config"
+
 )
 
 var DbName string
@@ -165,7 +166,7 @@ func createUser() {
 }
 
 // Инициализируем БД. Саму БД, пользователя, таблицы
-func init() {
+func Init() {
 
 	DbName = config.GetString("database.db-name")
 	ownerName = config.GetString("database.owner-name")

@@ -13,7 +13,7 @@ import (
 var kafkaURL string
 
 // Создаем подключение к кафке, настраиваем ее, чекаем подключение
-func init() {
+func Init() {
 
 	kafkaURL = os.Getenv("KAFKA_URL")
 	if kafkaURL == "" {

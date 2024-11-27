@@ -8,6 +8,7 @@ import (
 	"storage/conventions"
 	"storage/db"
 	"storage/kafka"
+
 )
 
 // получить JSON со всеми записями
@@ -76,6 +77,10 @@ func index(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+
+	cache.Init()
+	db.Init()
+	kafka.Init()
 
 	db.FillСache()
 	kafka.ReadKafka()

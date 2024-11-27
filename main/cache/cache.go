@@ -8,6 +8,7 @@ import (
 
 	"storage/config"
 	"storage/conventions"
+
 )
 
 var (
@@ -16,7 +17,7 @@ var (
 )
 
 // Создаем кеш
-func init() {
+func Init() {
 
 	var err error
 	cache, err = ristretto.NewCache(&ristretto.Config{
