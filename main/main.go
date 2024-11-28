@@ -63,6 +63,13 @@ func addOrder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//проверяем налчиче в кеше
+	if cache.GetByID(order.OrderUID).OrderUID != "" {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(order.OrderUID + " already used"))
+		return
+	}
+
 	//если успешно, отправляем в брокер
 	orderJSON, _ := json.Marshal(order)
 	kafka.SendMessage(string(orderJSON))
@@ -73,11 +80,34 @@ func addOrder(w http.ResponseWriter, r *http.Request) {
 
 // вернуть странцу для отображения данных
 func index(w http.ResponseWriter, r *http.Request) {
+	d := r.URL.Query()
+	print(d)
+	id := r.URL.Query().Get("id")
+	if id != "" {
+		order := cache.GetByID(id)
+		if order.OrderUID == "" {
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+
+		orders := [1]conventions.Order{order}
+		record, err := json.Marshal(orders)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(err.Error()))
+		}
+
+		w.Write(record)
+		return
+
+	}
+
 	http.ServeFile(w, r, "index.html")
 }
 
 func main() {
 
+	//Явно вызываем инициализацию
 	cache.Init()
 	db.Init()
 	kafka.Init()

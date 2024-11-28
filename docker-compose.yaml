@@ -17,7 +17,7 @@ services:
     restart: always
     container_name: storage_main
     # volumes: 
-    #   - ~/config.yaml:/usr/src/app/config.yaml
+    #   - config.yaml:/usr/src/app/config.yaml
     ports:
       - 8080:8080
     networks:

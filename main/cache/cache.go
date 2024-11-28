@@ -2,7 +2,6 @@ package cache
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"github.com/dgraph-io/ristretto"
 
@@ -32,6 +31,17 @@ func Init() {
 
 }
 
+func GetByID(id string) (order conventions.Order) {
+	value, ok := cache.Get(id)
+	if !ok {
+		//помечаем ключи, которых уже нет в кеше
+		return conventions.Order{OrderUID: ""}
+	}
+
+	return value.(conventions.Order)
+
+}
+
 // анмаршалим JSON и добавляем новый Order в кеш
 func Add(str string) {
 
@@ -40,11 +50,12 @@ func Add(str string) {
 		println("Error add new order in cache: %s", err)
 		return
 	}
-	ok := cache.Set(str, order, 1)
+
+	ok := cache.Set(order.OrderUID, order, 1)
 	if !ok {
 		println("key is not added")
 	}
-	keys[str] = true
+	keys[order.OrderUID] = true
 }
 
 // Возвращаем все Orders
@@ -61,9 +72,6 @@ func GetAll() []conventions.Order {
 			orders = append(orders, value.(conventions.Order))
 		}
 	}
-
-	fmt.Println(len(keys))
-	fmt.Println(len(oldKeys))
 
 	//удаляем старые (не актуальные) ключи
 	for _, oldKey := range oldKeys {

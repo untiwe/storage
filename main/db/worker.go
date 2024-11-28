@@ -8,7 +8,6 @@ import (
 
 	"storage/cache"
 	"storage/conventions"
-
 )
 
 // Заполнить кеш данными из базы
